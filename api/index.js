@@ -1,5 +1,4 @@
 const { MongoClient } = require("mongodb")
-const cors = require('cors')
 require('dotenv').config()
 
 let database
@@ -17,54 +16,47 @@ const connectToDatabase = async () => {
   }
 }
 
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
-}
-
-const getHighscores = async (req, res) => {
-  cors(corsOptions)(req, res, async () => {
-    if (req.method === 'GET') {
-      try {
-        await connectToDatabase()
-        const highscores = await database.collection('highscores')
-          .find()
-          .sort({ Score: -1 })
-          .toArray()
-        res.status(200).json(highscores)
-      } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch highscores' })
-      }
-    } else {
-      res.status(405).json({ error: 'Method not allowed' })
-    }
-  })
-}
-
-const postHighscore = async (req, res) => {
+const handleCors = (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Origin', '*')
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-    res.setHeader('Access-Control-Allow-Origin', '*')
     res.status(204).end()
     return
   }
-
-  cors(corsOptions)(req, res, async () => {
-    if (req.method === 'POST') {
-      try {
-        await connectToDatabase()
-        const newHighscore = req.body
-        await database.collection('highscores').insertOne(newHighscore)
-        res.status(201).json({ message: 'Highscore added successfully' })
-      } catch (error) {
-        res.status(500).json({ error: 'Failed to add highscore' })
-      }
-    } else {
-      res.status(405).json({ error: 'Method not allowed' })
-    }
-  })
+  next()
 }
 
-module.exports = { getHighscores, postHighscore }
+const getHighscores = async (req, res) => {
+  if (req.method === 'GET') {
+    try {
+      await connectToDatabase()
+      const highscores = await database.collection('highscores')
+        .find()
+        .sort({ Score: -1 })
+        .toArray()
+      res.status(200).json(highscores)
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch highscores' })
+    }
+  } else {
+    res.status(405).json({ error: 'Method not allowed' })
+  }
+}
+
+const postHighscore = async (req, res) => {
+  if (req.method === 'POST') {
+    try {
+      await connectToDatabase()
+      const newHighscore = req.body
+      await database.collection('highscores').insertOne(newHighscore)
+      res.status(201).json({ message: 'Highscore added successfully' })
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to add highscore' })
+    }
+  } else {
+    res.status(405).json({ error: 'Method not allowed' })
+  }
+}
+
+module.exports = { handleCors, getHighscores, postHighscore }
