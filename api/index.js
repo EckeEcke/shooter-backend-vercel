@@ -39,15 +39,15 @@ const getHighscores = async (req, res) => {
 }
 
 const postHighscore = async (req, res) => {
-  corsMiddleware(req, res, async () => {
-    if (req.method === 'OPTIONS') {
-      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.status(204).end()
-      return
-    }
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.status(204).end()
+    return
+  }
 
+  corsMiddleware(req, res, async () => {
     if (req.method === 'POST') {
       try {
         await connectToDatabase()
