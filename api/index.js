@@ -17,10 +17,6 @@ const connectToDatabase = async () => {
 }
 
 const getHighscores = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Access-Control-Allow-Origin', '*')
-
   if (req.method === 'OPTIONS') {
     res.status(204).end()
     return
@@ -43,10 +39,6 @@ const getHighscores = async (req, res) => {
 }
 
 const postHighscore = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Access-Control-Allow-Origin', '*')
-
   if (req.method === 'OPTIONS') {
     res.status(204).end()
     return
