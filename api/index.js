@@ -17,10 +17,14 @@ const connectToDatabase = async () => {
   }
 }
 
-const corsMiddleware = cors({ origin: '*' })
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}
 
 const getHighscores = async (req, res) => {
-  corsMiddleware(req, res, async () => {
+  cors(corsOptions)(req, res, async () => {
     if (req.method === 'GET') {
       try {
         await connectToDatabase()
@@ -47,7 +51,7 @@ const postHighscore = async (req, res) => {
     return
   }
 
-  corsMiddleware(req, res, async () => {
+  cors(corsOptions)(req, res, async () => {
     if (req.method === 'POST') {
       try {
         await connectToDatabase()
