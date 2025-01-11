@@ -1,4 +1,5 @@
 const { MongoClient } = require("mongodb")
+const cors = require('cors')
 require('dotenv').config()
 
 let database
@@ -16,36 +17,42 @@ const connectToDatabase = async () => {
   }
 }
 
+const corsMiddleware = cors({ origin: '*' })
+
 const getHighscores = async (req, res) => {
-  if (req.method === 'GET') {
-    try {
-      await connectToDatabase()
-      const highscores = await database.collection('highscores')
-        .find()
-        .sort({ Score: -1 })
-        .toArray()
-      res.status(200).json(highscores)
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch highscores' })
+  corsMiddleware(req, res, async () => {
+    if (req.method === 'GET') {
+      try {
+        await connectToDatabase()
+        const highscores = await database.collection('highscores')
+          .find()
+          .sort({ Score: -1 })
+          .toArray()
+        res.status(200).json(highscores)
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch highscores' })
+      }
+    } else {
+      res.status(405).json({ error: 'Method not allowed' })
     }
-  } else {
-    res.status(405).json({ error: 'Method not allowed' })
-  }
+  })
 }
 
 const postHighscore = async (req, res) => {
-  if (req.method === 'POST') {
-    try {
-      await connectToDatabase()
-      const newHighscore = req.body
-      await database.collection('highscores').insertOne(newHighscore)
-      res.status(201).json({ message: 'Highscore added successfully' })
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to add highscore' })
+  corsMiddleware(req, res, async () => {
+    if (req.method === 'POST') {
+      try {
+        await connectToDatabase()
+        const newHighscore = req.body
+        await database.collection('highscores').insertOne(newHighscore)
+        res.status(201).json({ message: 'Highscore added successfully' })
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to add highscore' })
+      }
+    } else {
+      res.status(405).json({ error: 'Method not allowed' })
     }
-  } else {
-    res.status(405).json({ error: 'Method not allowed' })
-  }
+  })
 }
 
 module.exports = { getHighscores, postHighscore }
