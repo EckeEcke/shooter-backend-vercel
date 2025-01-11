@@ -49,6 +49,11 @@ const postHighscore = async (req, res) => {
       } catch (error) {
         res.status(500).json({ error: 'Failed to add highscore' })
       }
+    } else if (req.method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      res.status(204).end()
     } else {
       res.status(405).json({ error: 'Method not allowed' })
     }
