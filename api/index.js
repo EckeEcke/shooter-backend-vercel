@@ -16,12 +16,21 @@ const connectToDatabase = async () => {
   }
 }
 
-const getHighscores = async (req, res) => {
+const allowCors = fn => async (req, res) => {
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
+  
   if (req.method === 'OPTIONS') {
-    res.status(204).end()
+    res.status(200).end()
     return
   }
 
+  return await fn(req, res)
+}
+
+const getHighscores = async (req, res) => {
   if (req.method === 'GET') {
     try {
       await connectToDatabase()
@@ -39,11 +48,6 @@ const getHighscores = async (req, res) => {
 }
 
 const postHighscore = async (req, res) => {
-  if (req.method === 'OPTIONS') {
-    res.status(204).end()
-    return
-  }
-
   if (req.method === 'POST') {
     try {
       await connectToDatabase()
@@ -58,4 +62,7 @@ const postHighscore = async (req, res) => {
   }
 }
 
-module.exports = { getHighscores, postHighscore }
+module.exports = {
+  getHighscores: allowCors(getHighscores),
+  postHighscore: allowCors(postHighscore)
+}
