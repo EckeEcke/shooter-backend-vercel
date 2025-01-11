@@ -1,5 +1,5 @@
-const { handleCors, getHighscores } = require('./path-to-your-function-file')
+const { getHighscores } = require('./index')
 
 module.exports = async (req, res) => {
-  handleCors(req, res, () => getHighscores(req, res))
+  await getHighscores(req, res)
 }
